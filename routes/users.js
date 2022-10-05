@@ -53,8 +53,7 @@ router.post("/login", (req, res) => {
                 if (!hash) {
                     res.status(401).json("Password is incorrect")
                 } else {
-                    console.log(hash);
-                    const accessToken = jwt.sign({id: user.idusers, email: user.email}, process.env.ACCESS_TOKEN);
+                    const accessToken = jwt.sign({id: user.idusers, email: user.email}, "secretKey");
                     res.status(200).json({
                         token: accessToken,
                         message: "Login successful",
