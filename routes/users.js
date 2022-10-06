@@ -6,6 +6,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
 
+router.get("/", (req, res) => {
+    db.query("SELECT idusers, email, name, admin, active FROM users", (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json(result)
+    })
+})
+
 router.post("/register", async (req, res) => {
     const { email, name, password } = req.body;
     try {
@@ -39,7 +51,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", (req, res) => {
     const { email, password } = req.body;
-    db.query(`SELECT idusers, email, password FROM users WHERE email = "${email}"`, async (err, result) => {
+    db.query(`SELECT idusers, email, password, admin, active FROM users WHERE email = "${email}"`, async (err, result) => {
         if (err) {
             res.status(401).json({
                 message: "Login not successful",
@@ -52,8 +64,13 @@ router.post("/login", (req, res) => {
             .then((hash) => {
                 if (!hash) {
                     res.status(401).json("Password is incorrect")
+                } else if (user.active == false) {
+                    res.status(401).json({
+                        message: "User blocked",
+                        error: "User is not active"
+                    })
                 } else {
-                    const accessToken = jwt.sign({id: user.idusers, email: user.email}, "secretKey");
+                    const accessToken = jwt.sign({id: user.idusers, email: user.email, isAdmin: user.admin, isActive: user.active}, "secretKey");
                     res.status(200).json({
                         token: accessToken,
                         message: "Login successful",
@@ -67,6 +84,104 @@ router.post("/login", (req, res) => {
                 err
             })
         }
+    })
+})
+
+router.put("/block", (req, res) => {
+    const { idusers, active } = req.body;
+    if (!active) {
+        res.status(400).json({message: "User already blocked"})
+        return;
+    }
+    console.log("second");
+    db.query(`UPDATE users SET active = 0 WHERE idusers = ${idusers}`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json({
+            message: "User blocked",
+            result
+        })
+    })
+})
+
+router.put("/activate", (req, res) => {
+    const { idusers, active } = req.body;
+    if (active) {
+        res.status(400).json({message: "User already active"})
+        return;
+    }
+    db.query(`UPDATE users SET active = 1 WHERE idusers = ${idusers}`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json({
+            message: "User activated",
+            result
+        })
+    })
+})
+
+router.put("/admin/block", (req, res) => {
+    const { idusers, admin } = req.body;
+    if (!admin) {
+        res.status(400).json({message: "User is not an admin"})
+        return;
+    }
+    console.log("second");
+    db.query(`UPDATE users SET admin = 0 WHERE idusers = ${idusers}`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json({
+            message: "User is not an admin anymore",
+            result
+        })
+    })
+})
+
+router.put("/admin/activate", (req, res) => {
+    const { idusers, admin } = req.body;
+    if (admin) {
+        res.status(400).json({message: "User is an admin"})
+        return;
+    }
+    db.query(`UPDATE users SET admin = 1 WHERE idusers = ${idusers}`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json({
+            message: "User set to admin",
+            result
+        })
+    })
+})
+
+router.post("/delete", (req, res) => {
+    const { idusers } = req.body;
+    db.query(`DELETE FROM users WHERE idusers = ${idusers}`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json({
+            message: "User deleted",
+            result
+        })
     })
 })
 

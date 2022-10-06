@@ -16,7 +16,7 @@ exports.verify = (req, res, next) => {
         })
     } else {
         res.status(401).json({
-            message: "You are not authenticated"
+            message: "You are not authenticated",
         })
     }
 }
