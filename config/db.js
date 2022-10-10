@@ -1,10 +1,10 @@
 const mysql = require("mysql");
 
 const db = mysql.createPool({
-    host: "eu-cdbr-west-03.cleardb.net",
-    user: "ba0d59e62b737f",
-    password: "bccb4163",
-    database: "heroku_efcda53ee95023f"
+    host: "MYSQL5044.site4now.net",
+    user: "a8e0b3_append",
+    password: "tUN058wlJv",
+    database: "db_a8e0b3_append"
 });
 
 module.exports = db;
