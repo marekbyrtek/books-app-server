@@ -63,7 +63,10 @@ router.post("/login", (req, res) => {
             await bcrypt.compare(password, user.password)
             .then((hash) => {
                 if (!hash) {
-                    res.status(401).json("Password is incorrect")
+                    res.status(401).json({
+                        message: "Password is incorrect",
+                        err
+                    })
                 } else if (user.active == false) {
                     res.status(401).json({
                         message: "User blocked",
