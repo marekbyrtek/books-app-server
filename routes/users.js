@@ -70,7 +70,7 @@ router.post("/login", (req, res) => {
                         error: "User is not active"
                     })
                 } else {
-                    const accessToken = jwt.sign({id: user.idusers, email: user.email, isAdmin: user.admin, isActive: user.active}, "secretKey");
+                    const accessToken = jwt.sign({id: user.idusers, email: user.email, isAdmin: user.admin}, "secretKey");
                     res.status(200).json({
                         token: accessToken,
                         message: "Login successful",
