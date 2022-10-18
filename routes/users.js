@@ -91,12 +91,7 @@ router.post("/login", (req, res) => {
 })
 
 router.put("/block", (req, res) => {
-    const { idusers, active } = req.body;
-    if (!active) {
-        res.status(400).json({message: "User already blocked"})
-        return;
-    }
-    console.log("second");
+    const { idusers } = req.body;
     db.query(`UPDATE users SET active = 0 WHERE idusers = ${idusers}`, (err, result) => {
         if (err) {
             res.status(400).json({
@@ -112,11 +107,7 @@ router.put("/block", (req, res) => {
 })
 
 router.put("/activate", (req, res) => {
-    const { idusers, active } = req.body;
-    if (active) {
-        res.status(400).json({message: "User already active"})
-        return;
-    }
+    const { idusers } = req.body;
     db.query(`UPDATE users SET active = 1 WHERE idusers = ${idusers}`, (err, result) => {
         if (err) {
             res.status(400).json({
@@ -132,12 +123,7 @@ router.put("/activate", (req, res) => {
 })
 
 router.put("/admin/block", (req, res) => {
-    const { idusers, admin } = req.body;
-    if (!admin) {
-        res.status(400).json({message: "User is not an admin"})
-        return;
-    }
-    console.log("second");
+    const { idusers } = req.body;
     db.query(`UPDATE users SET admin = 0 WHERE idusers = ${idusers}`, (err, result) => {
         if (err) {
             res.status(400).json({
@@ -153,11 +139,7 @@ router.put("/admin/block", (req, res) => {
 })
 
 router.put("/admin/activate", (req, res) => {
-    const { idusers, admin } = req.body;
-    if (admin) {
-        res.status(400).json({message: "User is an admin"})
-        return;
-    }
+    const { idusers } = req.body;
     db.query(`UPDATE users SET admin = 1 WHERE idusers = ${idusers}`, (err, result) => {
         if (err) {
             res.status(400).json({
