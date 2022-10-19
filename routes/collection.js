@@ -37,4 +37,19 @@ router.get("/get/:userID", (req, res) => {
     })
 })
 
+router.get("/home", (req, res) => {
+    db.query(`SELECT idcollection, collection.name, collection.topic, users.name AS author, COUNT(iditems) AS items FROM collection
+    JOIN items ON collection.idcollection = items.collection
+    JOIN users ON collection.user = users.idusers
+    GROUP BY idcollection ORDER BY items DESC LIMIT 5;`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json(result)
+    })
+})
+
 module.exports = router;
