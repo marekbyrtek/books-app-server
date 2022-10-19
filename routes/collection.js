@@ -23,7 +23,20 @@ router.post("/add", (req, res) => {
     )
 })
 
-router.get("/get/:userID", (req, res) => {
+router.get("/", (req, res) => {
+    db.query(`SELECT idcollection, name, description, topic FROM collection`, (err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: "Can't get collections",
+                err
+            })
+        } else {
+            res.status(200).json({ result })
+        }
+    })
+})
+
+router.get("/usercollection/:userID", (req, res) => {
     const id = req.params.userID;
     db.query(`SELECT idcollection, name, description, topic FROM collection WHERE user = ${id}`, (err, result) => {
         if (err) {
@@ -49,6 +62,24 @@ router.get("/home", (req, res) => {
             })
         }
         res.status(200).json(result)
+    })
+})
+
+router.post("/delete", (req, res) => {
+    const { idcollection } = req.body;
+    db.query(`DELETE collection.*, items.* FROM collection
+    LEFT JOIN items ON collection.idcollection = items.collection
+    WHERE collection.idcollection = ${idcollection};`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json({
+            message: "Collection deleted",
+            result
+        })
     })
 })
 
