@@ -66,20 +66,20 @@ router.post("/delete", (req, res) => {
     })
 })
 
-// router.put("/update", (req, res) => {
-//     const { iditems, name, tags } = req.body;
-//     db.query(`UPDATE items SET name = "${name}", tags = "${JSON.stringify(tags)}" WHERE iditems = ${iditems};`, (err, result) => {
-//         if (err) {
-//             res.status(400).json({
-//                 message: "An error occurred",
-//                 err
-//             })
-//         }
-//         res.status(200).json({
-//             message: "Item changed",
-//             result
-//         })
-//     })
-// })
+router.put("/update", (req, res) => {
+    const { iditems, name, tags } = req.body;
+    db.query(`UPDATE items SET name = "${name}", tags = JSON_ARRAY(${tags.map((el) => `"${el}"`)}) WHERE iditems = ${iditems};`, (err, result) => {
+        if (err) {
+            res.status(400).json({
+                message: "An error occurred",
+                err
+            })
+        }
+        res.status(200).json({
+            message: "Item changed",
+            result
+        })
+    })
+})
 
 module.exports = router;
