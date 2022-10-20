@@ -51,7 +51,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", (req, res) => {
     const { email, password } = req.body;
-    db.query(`SELECT idusers, email, password, admin, active FROM users WHERE email = "${email}"`, async (err, result) => {
+    db.query(`SELECT idusers, email, name, password, admin, active FROM users WHERE email = "${email}"`, async (err, result) => {
         if (err) {
             res.status(401).json({
                 message: "Login not successful",
@@ -73,7 +73,7 @@ router.post("/login", (req, res) => {
                         error: "User is not active"
                     })
                 } else {
-                    const accessToken = jwt.sign({id: user.idusers, email: user.email, isAdmin: user.admin}, "secretKey");
+                    const accessToken = jwt.sign({id: user.idusers, email: user.email, name: user.name, isAdmin: user.admin}, "secretKey");
                     res.status(200).json({
                         token: accessToken,
                         message: "Login successful",

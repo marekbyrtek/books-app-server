@@ -24,28 +24,31 @@ router.post("/add", (req, res) => {
 })
 
 router.get("/", (req, res) => {
-    db.query(`SELECT idcollection, name, description, topic FROM collection`, (err, result) => {
+    db.query(`SELECT idcollection, collection.name AS name, description, topic, users.name AS author FROM collection
+    JOIN users ON collection.user = users.idusers;`, (err, result) => {
         if (err) {
             res.status(401).json({
                 message: "Can't get collections",
                 err
             })
         } else {
-            res.status(200).json({ result })
+            res.status(200).json(result)
         }
     })
 })
 
-router.get("/usercollection/:userID", (req, res) => {
+router.get("/user/:userID", (req, res) => {
     const id = req.params.userID;
-    db.query(`SELECT idcollection, name, description, topic FROM collection WHERE user = ${id}`, (err, result) => {
+    db.query(`SELECT idcollection, collection.name AS name, description, topic, users.name AS author FROM collection
+    JOIN users ON collection.user = users.idusers
+    WHERE user = ${id};`, (err, result) => {
         if (err) {
             res.status(401).json({
                 message: "Can't get collections",
                 err
             })
         } else {
-            res.status(200).json({ result })
+            res.status(200).json(result)
         }
     })
 })
