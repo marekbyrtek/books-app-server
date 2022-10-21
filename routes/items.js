@@ -30,7 +30,7 @@ router.get("/get/:collection", (req, res) => {
                 err
             })
         } else {
-            res.status(200).json({ result })
+            res.status(200).json(result)
         }
     })
 })
