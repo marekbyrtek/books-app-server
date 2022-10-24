@@ -4,8 +4,8 @@ const db = require("../config/db");
 
 router.post("/add", (req, res) => {
     const { name, tags, collection } = req.body;
-    db.query("INSERT INTO items (name, tags, collection) VALUES (?, ?, ?)",
-    [name, JSON.stringify(tags), collection],
+    db.query("INSERT INTO items (name, collection) VALUES (?, ?)",
+    [name, collection],
     (err, result) => {
         if (err) {
             res.status(401).json({
@@ -13,9 +13,20 @@ router.post("/add", (req, res) => {
                 err
             })
         } else {
-            res.status(200).json({
-                message: "Item added",
-                result
+            const values = [];
+            tags.map((el) => values.push([el, result.insertId]));
+            db.query("INSERT INTO tags (tag, item) VALUES ?", [values], (err, result) => {
+                if (err) {
+                    res.status(401).json({
+                        message: "Can't add tags",
+                        err
+                    })
+                } else {
+                    res.status(200).json({
+                        message: "Item added",
+                        result
+                    })
+                }
             })
         }
     })
@@ -23,7 +34,10 @@ router.post("/add", (req, res) => {
 
 router.get("/get/:collection", (req, res) => {
     const collection = req.params.collection;
-    db.query(`SELECT iditems, name, tags FROM items WHERE collection = ${collection}`, (err, result) => {
+    db.query(`SELECT iditems, name, JSON_ARRAYAGG(tag) AS tags FROM items
+    JOIN tags ON tags.item = items.iditems
+    WHERE collection = ${collection}
+    GROUP BY name;`, (err, result) => {
         if (err) {
             res.status(401).json({
                 message: "Can't get items",
@@ -58,27 +72,29 @@ router.post("/delete", (req, res) => {
                 message: "An error occurred",
                 err
             })
+        } else {
+            res.status(200).json({
+                message: "Item deleted",
+                result
+            })
         }
-        res.status(200).json({
-            message: "Item deleted",
-            result
-        })
     })
 })
 
 router.put("/update", (req, res) => {
     const { iditems, name, tags } = req.body;
-    db.query(`UPDATE items SET name = "${name}", tags = JSON_ARRAY(${tags.map((el) => `"${el}"`)}) WHERE iditems = ${iditems};`, (err, result) => {
+    db.query(`UPDATE items SET name = "${name}" WHERE iditems = ${iditems};`, (err, result) => {
         if (err) {
             res.status(400).json({
                 message: "An error occurred",
                 err
             })
+        } else {
+            res.status(200).json({
+                message: "Item changed",
+                result
+            })
         }
-        res.status(200).json({
-            message: "Item changed",
-            result
-        })
     })
 })
 
