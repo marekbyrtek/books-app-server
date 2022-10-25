@@ -34,7 +34,7 @@ router.post("/add", (req, res) => {
 
 router.get("/get/:collection", (req, res) => {
     const collection = req.params.collection;
-    db.query(`SELECT iditems, name, JSON_ARRAYAGG(tag) AS tags FROM items
+    db.query(`SELECT iditems, name, group_concat(tag) AS tags FROM items
     JOIN tags ON tags.item = items.iditems
     WHERE collection = ${collection}
     GROUP BY name;`, (err, result) => {
