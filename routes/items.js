@@ -32,6 +32,20 @@ router.post("/add", (req, res) => {
     })
 })
 
+router.get("/user/:collection", (req, res) => {
+    const collection = req.params.collection;
+    db.query(`SELECT user FROM collection WHERE idcollection = ${collection};`, (err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: "An error occured",
+                err
+            })
+        } else {
+            res.status(200).json(result)
+        }
+    })
+})
+
 router.get("/get/:collection", (req, res) => {
     const collection = req.params.collection;
     db.query(`SELECT iditems, name, group_concat(tag) AS tags FROM items
