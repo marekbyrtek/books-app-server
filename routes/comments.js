@@ -36,4 +36,20 @@ router.post("/delete", (req, res) => {
     })
 })
 
+router.get("/:collection", (req, res) => {
+    const collection = req.params.collection;
+    db.query(`SELECT idcomments, comment, name FROM comments
+    JOIN users ON comments.user = users.idusers
+    WHERE collection = ${collection};`, (err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: "Can't get comments",
+                err
+            })
+        } else {
+            res.status(200).json(result)
+        }
+    })
+})
+
 module.exports = router;

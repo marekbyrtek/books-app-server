@@ -20,9 +20,9 @@ router.post("/add", (req, res) => {
     })
 })
 
-router.post ("/delete", (req, res) => {
+router.post("/delete", (req, res) => {
     const { user, collection } = req.body;
-    db.query(`DELETE FROM likes WHERE user = ${user} AND collection = ${collection}`, (err, result) => {
+    db.query(`DELETE FROM likes WHERE user = ${user} AND collection = ${collection};`, (err, result) => {
         if (err) {
             res.status(400).json({
                 message: "An error occurred",
@@ -33,6 +33,20 @@ router.post ("/delete", (req, res) => {
             message: "Collection disliked",
             result
         })
+    })
+})
+
+router.get("/:user", (req, res) => {
+    const user = req.params.user;
+    db.query(`SELECT collection FROM likes WHERE user = ${user};`, (err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: "Can't get likes",
+                err
+            })
+        } else {
+            res.status(200).json(result)
+        }
     })
 })
 
