@@ -70,19 +70,32 @@ router.get("/home", (req, res) => {
 
 router.post("/delete", (req, res) => {
     const { idcollection } = req.body;
-    db.query(`DELETE collection.*, items.* FROM collection
+    db.query(`DELETE collection.*, items.*, tags.* FROM collection
     LEFT JOIN items ON collection.idcollection = items.collection
+    LEFT JOIN tags ON items.iditems = tags.item
     WHERE collection.idcollection = ${idcollection};`, (err, result) => {
         if (err) {
             res.status(400).json({
                 message: "An error occurred",
                 err
             })
+        } else {
+            db.query(`DELETE comments.*, likes.* FROM comments
+            JOIN likes ON comments.collection = likes.collection
+            WHERE comments.collection = ${idcollection};`, (err, result) => {
+                if (err) {
+                    res.status(400).json({
+                        message: "An error occurred",
+                        err
+                    })
+                } else {
+                    res.status(200).json({
+                        message: "Collection deleted",
+                        result
+                    })
+                }
+            })
         }
-        res.status(200).json({
-            message: "Collection deleted",
-            result
-        })
     })
 })
 

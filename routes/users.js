@@ -170,4 +170,23 @@ router.post("/delete", (req, res) => {
     })
 })
 
+router.post("/newtoken/:user", (req, res) => {
+    const user = req.params.user;
+    db.query(`SELECT idusers, email, name, admin, active FROM users WHERE idusers = ${user}`, (err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: "An error occured",
+                err
+            })
+        } else {
+            const user = result[0];
+            const accessToken = jwt.sign({id: user.idusers, email: user.email, name: user.name, isAdmin: user.admin}, "secretKey");
+                res.status(200).json({
+                    token: accessToken,
+                    message: "Token changed"
+                })
+        }
+    })
+})
+
 module.exports = router;
