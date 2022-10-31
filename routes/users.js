@@ -156,7 +156,11 @@ router.put("/admin/activate", (req, res) => {
 
 router.post("/delete", (req, res) => {
     const { idusers } = req.body;
-    db.query(`DELETE FROM users WHERE idusers = ${idusers}`, (err, result) => {
+    db.query(`DELETE users.*, collection.*, comments.*, likes.* FROM users
+    JOIN collection ON collection.user = users.idusers
+    JOIN comments ON comments.user = users.idusers
+    JOIN likes ON likes.user = users.idusers
+    WHERE idusers = ${idusers}`, (err, result) => {
         if (err) {
             res.status(400).json({
                 message: "An error occurred",
